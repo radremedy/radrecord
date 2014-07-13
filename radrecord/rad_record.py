@@ -50,7 +50,6 @@ Underneath the hood a RadRecord is a Python named
 tuple, read it's documentation if you aren't familiar
 with it. It is a very nice and slick data structure.
 
-
 """
 RadRecord = namedtuple('RadRecord',
                        ('name',
@@ -66,20 +65,21 @@ RadRecord = namedtuple('RadRecord',
                         'description',
                         'source',
                         'category_name',
-                        'procedure_type'))
+                        'procedure_type',
+                        'visible'))
 
 
-def is_valid(rad_record):
+def is_valid(record):
     """
     A function to help validate RadRecords.
     A RadRecord name's should not be None.
     In the future we might impose more
     constraints
 
-    :param rad_record:
+    :param record:
     :return:
     """
-    return rad_record.name is not None
+    return record.name is not None
 
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
@@ -88,7 +88,7 @@ RadRecord.is_valid = is_valid
 def rad_record(name, street=None, city=None, state=None, country=None,
                zipcode=None, email=None, phone=None, fax=None, url=None,
                description=None, source=None, category_name=None,
-               procedure_type=None):
+               procedure_type=None, visible=True):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
@@ -96,4 +96,5 @@ def rad_record(name, street=None, city=None, state=None, country=None,
 
     """
     return RadRecord(name, street, city, state, country, zipcode, email, phone,
-                     fax, url, description, source, category_name, procedure_type)
+                     fax, url, description, source, category_name, procedure_type,
+                     visible)
