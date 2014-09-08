@@ -53,6 +53,8 @@ with it. It is a very nice and slick data structure.
 """
 RadRecord = namedtuple('RadRecord',
                        ('name',
+                        'organization',
+                        'address'
                         'street',
                         'city',
                         'state',
@@ -65,6 +67,7 @@ RadRecord = namedtuple('RadRecord',
                         'description',
                         'source',
                         'category_name',
+                        'category_names',
                         'procedure_type',
                         'visible'))
 
@@ -85,16 +88,17 @@ def is_valid(record):
 RadRecord.is_valid = is_valid
 
 
-def rad_record(name, street=None, city=None, state=None, country=None,
-               zipcode=None, email=None, phone=None, fax=None, url=None,
-               description=None, source=None, category_name=None,
-               procedure_type=None, visible=True):
+def rad_record(name, description=None, organization=None,
+    address=None, street=None, city=None, state=None, country=None, zipcode=None, 
+    email=None, phone=None, fax=None, url=None,
+    source=None, category_name=None, category_names=None,
+    procedure_type=None, visible=True):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
     specify the all the fields.
 
     """
-    return RadRecord(name, street, city, state, country, zipcode, email, phone,
-                     fax, url, description, source, category_name, procedure_type,
+    return RadRecord(name, organization, address, street, city, state, country, zipcode, email, phone,
+                     fax, url, description, source, category_name, category_names, procedure_type,
                      visible)
