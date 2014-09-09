@@ -51,25 +51,25 @@ tuple, read it's documentation if you aren't familiar
 with it. It is a very nice and slick data structure.
 
 """
-RadRecord = namedtuple('RadRecord',
-                       ('name',
-                        'organization',
-                        'address'
-                        'street',
-                        'city',
-                        'state',
-                        'country',
-                        'zipcode',
-                        'email',
-                        'phone',
-                        'fax',
-                        'url',
-                        'description',
-                        'source',
-                        'category_name',
-                        'category_names',
-                        'procedure_type',
-                        'visible'))
+RadRecord = namedtuple('RadRecord', [
+    'name',
+    'organization',
+    'description',
+    'address',
+    'street',
+    'city',
+    'state',
+    'country',
+    'zipcode',
+    'email',
+    'phone',
+    'fax',
+    'url',
+    'source',
+    'category_name',
+    'category_names',
+    'procedure_type',
+    'visible'])
 
 
 def is_valid(record):
@@ -79,26 +79,32 @@ def is_valid(record):
     In the future we might impose more
     constraints
 
-    :param record:
-    :return:
+    Args:
+        record: The record to validate.
+    
+    Returns:
+        A boolean indicating whether the provided record is none.
     """
-    return record.name is not None
+    return record.name is not None and not record.name.isspace()
+
 
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
 
 
-def rad_record(name, description=None, organization=None,
-    address=None, street=None, city=None, state=None, country=None, zipcode=None, 
+def rad_record(name, organization=None, description=None, 
+    address=None, street=None, city=None, state=None, zipcode=None, country=None, 
     email=None, phone=None, fax=None, url=None,
-    source=None, category_name=None, category_names=None,
-    procedure_type=None, visible=True):
+    source=None, category_name=None, category_names=None, procedure_type=None, 
+    visible=True):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
     specify the all the fields.
 
     """
-    return RadRecord(name, organization, address, street, city, state, country, zipcode, email, phone,
-                     fax, url, description, source, category_name, category_names, procedure_type,
-                     visible)
+    return RadRecord(name, organization, description,
+        address, street, city, state, country, zipcode, 
+        email, phone, fax, url,
+        source, category_name, category_names, procedure_type,
+        visible)
