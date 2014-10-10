@@ -88,9 +88,40 @@ def is_valid(record):
     return record.name is not None and not record.name.isspace()
 
 
+def convert_category_name(record):
+    """
+    Converts a RadRecord's category_name field to
+    a list of category_names (separated by semicolons)
+    and returns the updated RadRecord.
+
+    Args:
+        record: The record to convert.
+
+    Returns:
+        An updated version of the RadRecord with category_names
+        set appropriately. 
+    """
+    if record is None or record.category_name is None:
+        return record
+
+    # Split on semicolons, filter out blank entries,
+    # turn the transformed list into a set (to ensure)
+    # duplicates don't go in), and then convert it
+    # back to a list.
+    new_category_names = list(set((cat.strip() for cat \
+        in record.category_name.split(';')
+        if cat is not None and \
+            not cat.isspace())))
+
+    # Replace the category_names field in the tuple
+    return record._replace(category_names=new_category_names)
+
+
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
 
+# Also attach the convert_category_name function.
+RadRecord.convert_category_name = convert_category_name
 
 def rad_record(name, organization=None, description=None, 
     address=None, street=None, city=None, state=None, zipcode=None, country=None, 
@@ -100,8 +131,7 @@ def rad_record(name, organization=None, description=None,
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
-    specify the all the fields.
-
+    specify all of the fields.
     """
     return RadRecord(name, organization, description,
         address, street, city, state, country, zipcode, 
