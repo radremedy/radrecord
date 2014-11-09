@@ -75,17 +75,18 @@ RadRecord = namedtuple('RadRecord', [
 def is_valid(record):
     """
     A function to help validate RadRecords.
-    A RadRecord name's should not be None.
-    In the future we might impose more
-    constraints
+    A RadRecord name's should not be None, an empty string,
+    or consist entirely of whitespace.
 
     Args:
         record: The record to validate.
     
     Returns:
-        A boolean indicating whether the provided record is none.
+        A boolean indicating whether the provided record is valid.
     """
-    return record.name is not None and not record.name.isspace()
+    return record.name is not None and \
+        len(record.name) > 0 and \
+        not record.name.isspace()
 
 
 def convert_category_name(record):
