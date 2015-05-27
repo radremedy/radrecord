@@ -27,12 +27,12 @@ The rad_record function will return an instance of RadRecord.
 >>> r4 = rad_record(None)
 >>> r4.is_valid() # False
 
-For now all record needs to be valid is a name. In the future
-more restrictions might arise. Before being saved to a database or
-something similar should be valid.
-
+To be valid, all records must have a name. In addition, if a
+date_verified value is provided, it must be successfully
+parsed into a date using 'YYYY-MM-DD' format.
 """
 
+from datetime import datetime
 from collections import namedtuple
 
 
@@ -72,14 +72,17 @@ RadRecord = namedtuple('RadRecord', [
     'hours',
     'npi',
     'visible',
-    'notes'])
+    'notes',
+    'date_verified'])
 
 
 def is_valid(record):
     """
     A function to help validate RadRecords.
-    A RadRecord name's should not be None, an empty string,
-    or consist entirely of whitespace.
+    A RadRecord's name should not be None, an empty string,
+    or consist entirely of whitespace. In addition, if
+    date_verified is provided, it must parse into a date
+    using the 'YYYY-MM-DD' format.
 
     Args:
         record: The record to validate.
@@ -87,9 +90,25 @@ def is_valid(record):
     Returns:
         A boolean indicating whether the provided record is valid.
     """
-    return record.name is not None and \
-        len(record.name) > 0 and \
-        not record.name.isspace()
+    # First validate name
+    if record.name is None or \
+        len(record.name) == 0 or \
+        record.name.isspace():
+        return False
+
+    # Validate date_verified if provided
+    if record.date_verified is not None and \
+        len(record.date_verified) > 0 and \
+        not record.date_verified.isspace():
+        # Try to parse it out using 'YYYY-MM-DD'
+        try:
+            datetime.strptime(record.date_verified, '%Y-%m-%d')
+        except ValueError:
+            # Parsing error, return false
+            return False
+
+    # Fall-through case
+    return True
 
 
 def convert_category_name(record):
@@ -131,7 +150,7 @@ def rad_record(name, organization=None, description=None,
     address=None, street=None, city=None, state=None, zipcode=None, country=None, 
     email=None, phone=None, fax=None, url=None,
     source=None, category_name=None, category_names=None, procedure_type=None, 
-    hours=None, npi=None, visible=True, notes=None):
+    hours=None, npi=None, visible=True, notes=None, date_verified=None):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
@@ -141,4 +160,4 @@ def rad_record(name, organization=None, description=None,
         address, street, city, state, country, zipcode, 
         email, phone, fax, url,
         source, category_name, category_names, procedure_type,
-        hours, npi, visible, notes)
+        hours, npi, visible, notes, date_verified)
