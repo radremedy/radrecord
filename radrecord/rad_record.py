@@ -113,6 +113,34 @@ def is_valid(record):
     return True
 
 
+def parse_delimited_list(liststr):
+    """
+    Parses the provided string, which is assumed
+    to be a semicolon-delimited list of items,
+    into the corresponding unique list of strings.
+
+    Args:
+        liststr: The delimited string to parse.
+
+    Returns:
+        The resulting unique list of strings.
+    """
+    # Handle null/empty/whitespace values
+    if liststr is None or \
+        len(liststr) == 0 or \
+        liststr.isspace():
+        return list()
+
+    # Split on semicolons, filter out blank entries,
+    # turn the transformed list into a set (to ensure
+    # duplicates don't go in), and then convert it
+    # back to a list.
+    return list(set((cat.strip() for cat \
+        in liststr.split(';')
+        if cat is not None and \
+            len(cat) > 0 and \
+            not cat.isspace())))
+
 def convert_category_name(record):
     """
     Converts a RadRecord's category_name field to
@@ -126,17 +154,10 @@ def convert_category_name(record):
         An updated version of the RadRecord with category_names
         set appropriately. 
     """
-    if record is None or record.category_name is None:
+    if record is None:
         return record
 
-    # Split on semicolons, filter out blank entries,
-    # turn the transformed list into a set (to ensure)
-    # duplicates don't go in), and then convert it
-    # back to a list.
-    new_category_names = list(set((cat.strip() for cat \
-        in record.category_name.split(';')
-        if cat is not None and \
-            not cat.isspace())))
+    new_category_names = parse_delimited_list(record.category_name)
 
     # Replace the category_names field in the tuple
     return record._replace(category_names=new_category_names)
@@ -155,17 +176,10 @@ def convert_population_names(record):
         An updated version of the RadRecord with population_tags
         set appropriately. 
     """
-    if record is None or record.population_names is None:
+    if record is None:
         return record
 
-    # Split on semicolons, filter out blank entries,
-    # turn the transformed list into a set (to ensure)
-    # duplicates don't go in), and then convert it
-    # back to a list.
-    new_population_tags = list(set((pop.strip() for pop \
-        in record.population_names.split(';')
-        if pop is not None and \
-            not pop.isspace())))
+    new_population_tags = parse_delimited_list(record.population_names)
 
     # Replace the population_tags field in the tuple
     return record._replace(population_tags=new_population_tags)
