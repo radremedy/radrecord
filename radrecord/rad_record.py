@@ -68,6 +68,8 @@ RadRecord = namedtuple('RadRecord', [
     'source',
     'category_name',
     'category_names',
+    'population_names',
+    'population_tags',
     'procedure_type',
     'hours',
     'npi',
@@ -140,16 +142,47 @@ def convert_category_name(record):
     return record._replace(category_names=new_category_names)
 
 
+def convert_population_names(record):
+    """
+    Converts a RadRecord's population_names field to
+    a list of population_tags (separated by semicolons)
+    and returns the updated RadRecord.
+
+    Args:
+        record: The record to convert.
+
+    Returns:
+        An updated version of the RadRecord with population_tags
+        set appropriately. 
+    """
+    if record is None or record.population_names is None:
+        return record
+
+    # Split on semicolons, filter out blank entries,
+    # turn the transformed list into a set (to ensure)
+    # duplicates don't go in), and then convert it
+    # back to a list.
+    new_population_tags = list(set((pop.strip() for pop \
+        in record.population_names.split(';')
+        if pop is not None and \
+            not pop.isspace())))
+
+    # Replace the population_tags field in the tuple
+    return record._replace(population_tags=new_population_tags)
+
+
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
 
-# Also attach the convert_category_name function.
+# Also attach the conversion functions.
 RadRecord.convert_category_name = convert_category_name
+RadRecord.convert_population_names = convert_population_names
 
 def rad_record(name, organization=None, description=None, 
     address=None, street=None, city=None, state=None, zipcode=None, country=None, 
     email=None, phone=None, fax=None, url=None,
-    source=None, category_name=None, category_names=None, procedure_type=None, 
+    source=None, category_name=None, category_names=None, 
+    population_names=None, population_tags=None, procedure_type=None, 
     hours=None, npi=None, visible=True, notes=None, date_verified=None):
     """
     Convenience method to create RadRecords with optional fields.
@@ -159,5 +192,6 @@ def rad_record(name, organization=None, description=None,
     return RadRecord(name, organization, description,
         address, street, city, state, country, zipcode, 
         email, phone, fax, url,
-        source, category_name, category_names, procedure_type,
+        source, category_name, category_names, 
+        population_names, population_tags, procedure_type,
         hours, npi, visible, notes, date_verified)
