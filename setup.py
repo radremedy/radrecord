@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = "radrecord",
     packages = ["radrecord"],
-    version = "1.4.0",
+    version = "1.4.1",
     description = "A data format to be used throughout the RAD Remedy project",
     url = "https://github.com/radremedy/radrecord",
 )
