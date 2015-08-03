@@ -147,6 +147,9 @@ def convert_category_name(record):
     a list of category_names (separated by semicolons)
     and returns the updated RadRecord.
 
+    Will bypass processing if category_names is already
+    populated with data.
+
     Args:
         record: The record to convert.
 
@@ -155,6 +158,11 @@ def convert_category_name(record):
         set appropriately. 
     """
     if record is None:
+        return record
+
+    # Don't bother if we already have category_names
+    if record.category_names is not None and \
+        len(record.category_names) > 0:
         return record
 
     new_category_names = parse_delimited_list(record.category_name)
@@ -168,6 +176,9 @@ def convert_population_names(record):
     Converts a RadRecord's population_names field to
     a list of population_tags (separated by semicolons)
     and returns the updated RadRecord.
+    
+    Will bypass processing if population_tags is already
+    populated with data.
 
     Args:
         record: The record to convert.
@@ -177,6 +188,11 @@ def convert_population_names(record):
         set appropriately. 
     """
     if record is None:
+        return record
+
+    # Don't bother if we already have population_tags
+    if record.population_tags is not None and \
+        len(record.population_tags) > 0:
         return record
 
     new_population_tags = parse_delimited_list(record.population_names)
