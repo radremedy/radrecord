@@ -71,6 +71,11 @@ RadRecord = namedtuple('RadRecord', [
     'population_names',
     'population_tags',
     'procedure_type',
+    'is_icath', 
+    'is_wpath', 
+    'wheelchair_accessible', 
+    'sliding_scale',
+    'hospital_affiliation',
     'hours',
     'npi',
     'visible',
@@ -141,6 +146,60 @@ def parse_delimited_list(liststr):
             len(cat) > 0 and \
             not cat.isspace())))
 
+# Store some lowercase sets for true/false strings
+true_values = set([u'true', u't', u'yes', u'y', u'1'])
+false_values = set([u'false', u'f', u'no', u'n', u'0'])
+
+def convert_boolean(boolVal):
+    """
+    Coerces the provided value to a Boolean value, falling back to
+    None if the value could not be converted.
+
+    Args:
+        boolVal: The value to convert.
+
+    Returns:
+        True, False, or None depending on the result of the conversion.
+    """
+    # Handle None types
+    if boolVal is None:
+        return None
+
+    # Handle Boolean types
+    if isinstance(boolVal, bool):
+        return boolVal
+
+    # Handle strings
+    if isinstance(boolVal, str) or isinstance(boolVal, unicode):
+        # Handle empty values
+        if len(boolVal) == 0 or boolVal.isspace():
+            return None
+
+        # Normalize the string to Unicode, trim it, and lowercase it
+        boolVal = unicode(boolVal).strip().lower()
+
+        # Now look for it in our sets, falling back to None if
+        # we don't find anything
+        if boolVal in true_values:
+            return True
+        elif boolVal in false_values:
+            return False
+        else:
+            return None
+
+    # Handle integer/float types
+    if isinstance(boolVal, int) or isinstance(boolVal, float):
+        if boolVal == 1:
+            return True
+        elif boolVal == 0:
+            return False
+        else:
+            return None
+
+    # Fall-through case
+    return None
+
+
 def convert_category_name(record):
     """
     Converts a RadRecord's category_name field to
@@ -201,19 +260,51 @@ def convert_population_names(record):
     return record._replace(population_tags=new_population_tags)
 
 
+def normalize_record(record):
+    """
+    Normalizes all fields on the provided RadRecord.
+
+    Args:
+        record: The RadRecord to normalize.
+
+    Returns:
+        A normalized verion of the RadRecord.
+    """
+    if record is None:
+        return None
+
+    # Normalize values of "None" on visible - that shouldn't be null.
+    if record.visible is None:
+        record = record._replace(visible=False)
+
+
+    # Convert names to delimited strings and normalize
+    # all Boolean values.
+    return record.convert_category_name(). \
+        convert_population_names(). \
+        _replace(is_wpath=convert_boolean(record.is_wpath),
+            is_icath=convert_boolean(record.is_icath),
+            wheelchair_accessible=convert_boolean(record.wheelchair_accessible),
+            sliding_scale=convert_boolean(record.sliding_scale),
+            visible=convert_boolean(record.visible))
+
+
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
 
 # Also attach the conversion functions.
 RadRecord.convert_category_name = convert_category_name
 RadRecord.convert_population_names = convert_population_names
+RadRecord.normalize_record = normalize_record
 
 def rad_record(name, organization=None, description=None, 
     address=None, street=None, city=None, state=None, zipcode=None, country=None, 
     email=None, phone=None, fax=None, url=None,
     source=None, category_name=None, category_names=None, 
     population_names=None, population_tags=None, procedure_type=None, 
-    hours=None, npi=None, visible=True, notes=None, date_verified=None):
+    is_icath=None, is_wpath=None, wheelchair_accessible=None, sliding_scale=None,
+    hospital_affiliation=None, hours=None, npi=None, visible=True, 
+    notes=None, date_verified=None):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
@@ -224,4 +315,5 @@ def rad_record(name, organization=None, description=None,
         email, phone, fax, url,
         source, category_name, category_names, 
         population_names, population_tags, procedure_type,
-        hours, npi, visible, notes, date_verified)
+        is_icath, is_wpath, wheelchair_accessible, sliding_scale,
+        hospital_affiliation, hours, npi, visible, notes, date_verified)
