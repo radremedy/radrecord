@@ -141,6 +141,60 @@ def parse_delimited_list(liststr):
             len(cat) > 0 and \
             not cat.isspace())))
 
+# Store some lowercase sets for true/false strings
+true_values = set([u'true', u't', u'yes', u'y', u'1'])
+false_values = set([u'false', u'f', u'no', u'n', u'0'])
+
+def convert_boolean(boolVal):
+    """
+    Coerces the provided value to a Boolean value, falling back to
+    None if the value could not be converted.
+
+    Args:
+        boolVal: The value to convert.
+
+    Returns:
+        True, False, or None depending on the result of the conversion.
+    """
+    # Handle None types
+    if boolVal is None:
+        return None
+
+    # Handle Boolean types
+    if isinstance(boolVal, bool):
+        return boolVal
+
+    # Handle strings
+    if isinstance(boolVal, str) or isinstance(boolVal, unicode):
+        # Handle empty values
+        if len(boolVal) == 0 or boolVal.isspace():
+            return None
+
+        # Normalize the string to Unicode, trim it, and lowercase it
+        boolVal = unicode(boolVal).strip().lower()
+
+        # Now look for it in our sets, falling back to None if
+        # we don't find anything
+        if boolVal in true_values:
+            return True
+        elif boolVal in false_values:
+            return False
+        else:
+            return None
+
+    # Handle integer/float types
+    if isinstance(boolVal, int) or isinstance(boolVal, float):
+        if boolVal == 1:
+            return True
+        elif boolVal == 0:
+            return False
+        else:
+            return None
+
+    # Fall-through case
+    return None
+
+
 def convert_category_name(record):
     """
     Converts a RadRecord's category_name field to
@@ -201,12 +255,30 @@ def convert_population_names(record):
     return record._replace(population_tags=new_population_tags)
 
 
+def normalize_record(record):
+    """
+    Normalizes all fields on the provided RadRecord.
+
+    Args:
+        record: The RadRecord to normalize.
+
+    Returns:
+        A normalized verion of the RadRecord.
+    """
+    if record is None:
+        return None
+
+    return record.convert_category_name(). \
+        convert_population_names()
+
+
 # Give every RadRecord a method to help with validation.
 RadRecord.is_valid = is_valid
 
 # Also attach the conversion functions.
 RadRecord.convert_category_name = convert_category_name
 RadRecord.convert_population_names = convert_population_names
+RadRecord.normalize_record = normalize_record
 
 def rad_record(name, organization=None, description=None, 
     address=None, street=None, city=None, state=None, zipcode=None, country=None, 

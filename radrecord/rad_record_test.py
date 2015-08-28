@@ -5,7 +5,7 @@ Contains unit tests for normalization and validation of RadRecords.
 """
 import unittest
 
-from rad_record import rad_record, parse_delimited_list
+from rad_record import rad_record, parse_delimited_list, convert_boolean
 
 class TestRadRecords(unittest.TestCase):
 
@@ -126,6 +126,52 @@ class TestRadRecords(unittest.TestCase):
         self.assertIn('Population A', updated_record.population_tags)
         self.assertNotIn('New Population 1', updated_record.population_tags)
         self.assertNotIn('New Population 2', updated_record.population_tags)
+
+
+    def test_convert_boolean_none(self):
+        """
+        Tests convert_boolean cases where the expected result is None.
+        """
+        self.assertIsNone(convert_boolean(None))
+        self.assertIsNone(convert_boolean(''))
+        self.assertIsNone(convert_boolean('BAD STRING'))
+        self.assertIsNone(convert_boolean(-1))
+
+
+    def test_convert_boolean_true(self):
+        """
+        Tests convert_boolean cases where the expected result is True.
+        """
+        self.assertTrue(convert_boolean(True))
+
+        self.assertTrue(convert_boolean(' True '))
+        self.assertTrue(convert_boolean(u'True'))
+        self.assertTrue(convert_boolean('T'))
+
+        self.assertTrue(convert_boolean('Yes'))
+        self.assertTrue(convert_boolean('Y'))
+        self.assertTrue(convert_boolean('1'))
+
+        self.assertTrue(convert_boolean(1))
+        self.assertTrue(convert_boolean(1.0))
+
+
+    def test_convert_boolean_false(self):
+        """
+        Tests convert_boolean cases where the expected result is False.
+        """
+        self.assertFalse(convert_boolean(False))
+        
+        self.assertFalse(convert_boolean(' False '))
+        self.assertFalse(convert_boolean(u'False'))
+        self.assertFalse(convert_boolean('F'))
+
+        self.assertFalse(convert_boolean('No'))
+        self.assertFalse(convert_boolean('N'))
+        self.assertFalse(convert_boolean('0'))
+
+        self.assertFalse(convert_boolean(0))
+        self.assertFalse(convert_boolean(0.0))
 
 
 if __name__ == '__main__':
