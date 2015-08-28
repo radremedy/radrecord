@@ -71,6 +71,11 @@ RadRecord = namedtuple('RadRecord', [
     'population_names',
     'population_tags',
     'procedure_type',
+    'is_icath', 
+    'is_wpath', 
+    'wheelchair_accessible', 
+    'sliding_scale',
+    'hospital_affiliation',
     'hours',
     'npi',
     'visible',
@@ -285,7 +290,9 @@ def rad_record(name, organization=None, description=None,
     email=None, phone=None, fax=None, url=None,
     source=None, category_name=None, category_names=None, 
     population_names=None, population_tags=None, procedure_type=None, 
-    hours=None, npi=None, visible=True, notes=None, date_verified=None):
+    is_icath=None, is_wpath=None, wheelchair_accessible=None, sliding_scale=None,
+    hospital_affiliation=None, hours=None, npi=None, visible=True, 
+    notes=None, date_verified=None):
     """
     Convenience method to create RadRecords with optional fields.
     Use this instead of the class constructor so you don't have to
@@ -296,4 +303,5 @@ def rad_record(name, organization=None, description=None,
         email, phone, fax, url,
         source, category_name, category_names, 
         population_names, population_tags, procedure_type,
-        hours, npi, visible, notes, date_verified)
+        is_icath, is_wpath, wheelchair_accessible, sliding_scale,
+        hospital_affiliation, hours, npi, visible, notes, date_verified)
