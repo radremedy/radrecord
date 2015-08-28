@@ -79,7 +79,9 @@ class TestRadRecords(unittest.TestCase):
         category_name into category_names.
         """
         record = rad_record(name='Record', category_name='Category 1')
+        
         updated_record = record.convert_category_name()
+        record = None
 
         self.assertEqual(len(updated_record.category_names), 1)
         self.assertIn('Category 1', updated_record.category_names)
@@ -92,7 +94,9 @@ class TestRadRecords(unittest.TestCase):
         """
         record = rad_record(name='Record', category_name='New Category 1',
             category_names=['Category A', 'Category B'])
+
         updated_record = record.convert_category_name()
+        record = None
 
         self.assertEqual(len(updated_record.category_names), 2)
         self.assertIn('Category A', updated_record.category_names)
@@ -106,7 +110,9 @@ class TestRadRecords(unittest.TestCase):
         population_names into population_tags.
         """
         record = rad_record(name='Record', population_names='Population 1;Population 2')
+
         updated_record = record.convert_population_names()
+        record = None
 
         self.assertEqual(len(updated_record.population_tags), 2)
         self.assertIn('Population 1', updated_record.population_tags)
@@ -120,7 +126,9 @@ class TestRadRecords(unittest.TestCase):
         """
         record = rad_record(name='Record', population_names='New Population 1;New Population 2',
             population_tags=['Population A'])
+
         updated_record = record.convert_population_names()
+        record = None
 
         self.assertEqual(len(updated_record.population_tags), 1)
         self.assertIn('Population A', updated_record.population_tags)
@@ -172,6 +180,38 @@ class TestRadRecords(unittest.TestCase):
 
         self.assertFalse(convert_boolean(0))
         self.assertFalse(convert_boolean(0.0))
+
+
+    def test_normalize_record(self):
+        """
+        Tests the normalize_record process.
+        """
+        record = rad_record(name='Record', 
+            population_names='Population 1; Population 2',
+            category_name='Category A',
+            is_icath=True,
+            is_wpath='F',
+            sliding_scale=1,
+            wheelchair_accessible=u'No',
+            visible=None)
+
+        updated_record = record.normalize_record()
+        record = None
+
+        self.assertEqual(len(updated_record.population_tags), 2)
+        self.assertIn('Population 1', updated_record.population_tags)
+        self.assertIn('Population 2', updated_record.population_tags)
+
+        self.assertEqual(len(updated_record.category_names), 1)
+        self.assertIn('Category A', updated_record.category_names)
+
+        self.assertTrue(updated_record.is_icath)
+        self.assertFalse(updated_record.is_wpath)
+        self.assertTrue(updated_record.sliding_scale)
+        self.assertFalse(updated_record.wheelchair_accessible)
+
+        # Ensure "None" gets coerced to False
+        self.assertFalse(updated_record.visible)
 
 
 if __name__ == '__main__':

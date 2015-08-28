@@ -273,8 +273,20 @@ def normalize_record(record):
     if record is None:
         return None
 
+    # Normalize values of "None" on visible - that shouldn't be null.
+    if record.visible is None:
+        record = record._replace(visible=False)
+
+
+    # Convert names to delimited strings and normalize
+    # all Boolean values.
     return record.convert_category_name(). \
-        convert_population_names()
+        convert_population_names(). \
+        _replace(is_wpath=convert_boolean(record.is_wpath),
+            is_icath=convert_boolean(record.is_icath),
+            wheelchair_accessible=convert_boolean(record.wheelchair_accessible),
+            sliding_scale=convert_boolean(record.sliding_scale),
+            visible=convert_boolean(record.visible))
 
 
 # Give every RadRecord a method to help with validation.
